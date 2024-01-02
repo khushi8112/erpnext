@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 frappe.listview_settings["Item"] = {
 	add_fields: ["item_name", "stock_uom", "item_group", "image", "has_variants", "end_of_life", "disabled"],
+=======
+frappe.listview_settings['Item'] = {
+	add_fields: ["item_name", "stock_uom", "item_group", "image",
+		"has_variants", "end_of_life", "disabled", "variant_of"],
+>>>>>>> 9ea963bfe9 (fix: Variant Items, List View Enabled to Variant Status Change (#38468))
 	filters: [["disabled", "=", "0"]],
 
 	get_indicator: function (doc) {
