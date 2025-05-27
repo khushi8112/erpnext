@@ -118,6 +118,7 @@ class Asset(AccountsController):
 	# end: auto-generated types
 
 	def validate(self):
+		# test
 		self.validate_category()
 		self.validate_precision()
 		self.set_purchase_doc_row_item()
