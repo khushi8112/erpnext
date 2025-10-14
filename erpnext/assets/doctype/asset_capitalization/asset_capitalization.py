@@ -492,6 +492,7 @@ class AssetCapitalization(StockController):
 			asset = frappe.get_doc("Asset", item.asset)
 
 			if asset.calculate_depreciation:
+				frappe.flags.is_composite_asset = True
 				notes = _(
 					"This schedule was created when Asset {0} was consumed through Asset Capitalization {1}."
 				).format(
@@ -499,6 +500,7 @@ class AssetCapitalization(StockController):
 					get_link_to_form(self.doctype, self.get("name")),
 				)
 				depreciate_asset(asset, self.posting_date, notes)
+				frappe.flags.is_composite_asset = False
 				asset.reload()
 
 			fixed_asset_gl_entries = get_gl_entries_on_asset_disposal(
