@@ -200,10 +200,16 @@ class TestSalesOrder(AccountsTestMixin, FrappeTestCase):
 		so.load_from_db()
 		self.assertEqual(so.per_billed, 0)
 
+<<<<<<< HEAD
 	@change_settings(
 		"Accounts Settings",
 		{"add_taxes_from_item_tax_template": 0, "add_taxes_from_taxes_and_charges_template": 1},
 	)
+=======
+	@IntegrationTestCase.change_settings(
+		"Accounts Settings", {"automatically_fetch_payment_terms": 1}
+	)  # Enable auto fetch
+>>>>>>> cf1d892d60 (fix: Payment Terms auto-fetched in Sales Invoice even when automatically_fetch_payment_terms is disabled)
 	def test_make_sales_invoice_with_terms(self):
 		so = make_sales_order(do_not_submit=True)
 
@@ -231,6 +237,38 @@ class TestSalesOrder(AccountsTestMixin, FrappeTestCase):
 
 		si1 = make_sales_invoice(so.name)
 		self.assertEqual(len(si1.get("items")), 0)
+
+	@IntegrationTestCase.change_settings(
+		"Accounts Settings", {"automatically_fetch_payment_terms": 1}
+	)  # Enable auto fetch
+	def test_auto_fetch_terms_enable(self):
+		so = make_sales_order(do_not_submit=True)
+
+		so.payment_terms_template = "_Test Payment Term Template"
+		so.save()
+		so.submit()
+
+		si = make_sales_invoice(so.name)
+		# Check if payment terms are copied from sales order to sales invoice
+		self.assertTrue(si.payment_terms_template)
+		si.insert()
+		si.submit()
+
+	@IntegrationTestCase.change_settings(
+		"Accounts Settings", {"automatically_fetch_payment_terms": 0}
+	)  # Disable auto fetch
+	def test_auto_fetch_terms_disable(self):
+		so = make_sales_order(do_not_submit=True)
+
+		so.payment_terms_template = "_Test Payment Term Template"
+		so.save()
+		so.submit()
+
+		si = make_sales_invoice(so.name)
+		# Check if payment terms are not copied from sales order to sales invoice
+		self.assertFalse(si.payment_terms_template)
+		si.insert()
+		si.submit()
 
 	def test_update_qty(self):
 		so = make_sales_order()
