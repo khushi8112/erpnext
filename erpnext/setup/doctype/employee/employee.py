@@ -436,3 +436,28 @@ def has_upload_permission(doc, ptype="read", user=None):
 	if get_doc_permissions(doc, user=user, ptype=ptype).get(ptype):
 		return True
 	return doc.user_id == user
+
+
+@frappe.whitelist()
+def get_contact_details(employee: str) -> dict:
+	"""
+	Returns basic contact details for the given employee.
+
+	- employee_name as contact_display
+	- prefered_email as contact_email
+	- cell_number as contact_mobile
+	- designation as contact_designation
+	- department as contact_department
+
+	:param employee: Employee docname
+	"""
+	doc: Employee = frappe.get_doc("Employee", employee)
+	doc.check_permission()
+
+	return {
+		"contact_display": doc.get("employee_name"),
+		"contact_email": doc.get("prefered_email"),
+		"contact_mobile": doc.get("cell_number"),
+		"contact_designation": doc.get("designation"),
+		"contact_department": doc.get("department"),
+	}
