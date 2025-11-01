@@ -314,6 +314,16 @@ erpnext.utils.get_contact_details = function (frm) {
 	}
 };
 
+erpnext.utils.get_employee_contact_details = async function (employee) {
+	if (!employee) return;
+
+	const response = await frappe.xcall("erpnext.setup.doctype.employee.employee.get_contact_details", {
+		employee,
+	});
+
+	return response?.message;
+};
+
 erpnext.utils.validate_mandatory = function (frm, label, value, trigger_on) {
 	if (!value) {
 		frm.doc[trigger_on] = "";
