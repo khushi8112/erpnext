@@ -451,6 +451,9 @@ def get_contact_details(employee: str) -> dict:
 
 	:param employee: Employee docname
 	"""
+	if not employee:
+		frappe.throw(msg=_("Employee is required"), title=_("Missing Parameter"))
+
 	doc: Employee = frappe.get_doc("Employee", employee)
 	doc.check_permission()
 
