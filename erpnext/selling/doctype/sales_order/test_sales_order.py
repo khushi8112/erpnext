@@ -232,9 +232,7 @@ class TestSalesOrder(AccountsTestMixin, FrappeTestCase):
 		si1 = make_sales_invoice(so.name)
 		self.assertEqual(len(si1.get("items")), 0)
 
-	@change_settings(
-		"Accounts Settings", {"automatically_fetch_payment_terms": 1}
-	)  # Enable auto fetch
+	@change_settings("Accounts Settings", {"automatically_fetch_payment_terms": 1})  # Enable auto fetch
 	def test_auto_fetch_terms_enable(self):
 		so = make_sales_order(do_not_submit=True)
 
@@ -248,9 +246,7 @@ class TestSalesOrder(AccountsTestMixin, FrappeTestCase):
 		si.insert()
 		si.submit()
 
-	@change_settings(
-		"Accounts Settings", {"automatically_fetch_payment_terms": 0}
-	)  # Disable auto fetch
+	@change_settings("Accounts Settings", {"automatically_fetch_payment_terms": 0})  # Disable auto fetch
 	def test_auto_fetch_terms_disable(self):
 		so = make_sales_order(do_not_submit=True)
 
