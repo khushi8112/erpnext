@@ -2580,12 +2580,12 @@ class AccountsController(TransactionBase):
 
 	def get_order_details(self):
 		if self.doctype == "Sales Invoice":
-			po_or_so = self.get("items")[0].get("sales_order")
+			po_or_so = self.get("items") and self.get("items")[0].get("sales_order")
 			po_or_so_doctype = "Sales Order"
 			po_or_so_doctype_name = "sales_order"
 
 		else:
-			po_or_so = self.get("items")[0].get("purchase_order")
+			po_or_so = self.get("items") and self.get("items")[0].get("purchase_order")
 			po_or_so_doctype = "Purchase Order"
 			po_or_so_doctype_name = "purchase_order"
 
