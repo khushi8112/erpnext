@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
  "allow_copy": 0, 
  "allow_events_in_timeline": 0, 
  "allow_guest_to_view": 0, 
@@ -13,6 +14,18 @@
  "document_type": "", 
  "editable_grid": 1, 
  "engine": "InnoDB", 
+=======
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:market_segment",
+ "creation": "2018-10-01 09:59:14.479509",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "market_segment"
+ ],
+>>>>>>> f3142c4af6 (fix: allow rename for market segment doctype)
  "fields": [
   {
    "allow_bulk_edit": 0, 
@@ -46,6 +59,7 @@
    "translatable": 0, 
    "unique": 1
   }
+<<<<<<< HEAD
  ], 
  "has_web_view": 0, 
  "hide_heading": 0, 
@@ -63,6 +77,16 @@
  "name": "Market Segment", 
  "name_case": "", 
  "owner": "Administrator", 
+=======
+ ],
+ "links": [],
+ "modified": "2025-12-17 12:09:34.687368",
+ "modified_by": "Administrator",
+ "module": "CRM",
+ "name": "Market Segment",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+>>>>>>> f3142c4af6 (fix: allow rename for market segment doctype)
  "permissions": [
   {
    "amend": 0, 
@@ -83,6 +107,7 @@
    "submit": 0, 
    "write": 1
   }
+<<<<<<< HEAD
  ], 
  "quick_entry": 1, 
  "read_only": 0, 
@@ -94,3 +119,14 @@
  "track_seen": 0, 
  "track_views": 0
 }
+=======
+ ],
+ "quick_entry": 1,
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "translated_doctype": 1
+}
+>>>>>>> f3142c4af6 (fix: allow rename for market segment doctype)
