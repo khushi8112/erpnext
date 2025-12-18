@@ -300,19 +300,9 @@ def complete_contact_details(party_details):
 	contact_details = frappe._dict()
 
 	if party_details.party_type == "Employee":
-		contact_details = frappe.db.get_value(
-			"Employee",
-			party_details.party,
-			[
-				"employee_name as contact_display",
-				"prefered_email as contact_email",
-				"cell_number as contact_mobile",
-				"designation as contact_designation",
-				"department as contact_department",
-			],
-			as_dict=True,
-		)
+		from erpnext.setup.doctype.employee.employee import get_contact_details as get_employee_contact
 
+		contact_details = get_employee_contact(party_details.party)
 		contact_details.update({"contact_person": None, "contact_phone": None})
 	elif party_details.contact_person:
 		contact_details = frappe.db.get_value(

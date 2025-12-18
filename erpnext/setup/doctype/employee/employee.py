@@ -6,7 +6,6 @@ from frappe.model.naming import set_name_by_naming_series
 from frappe.permissions import (
 	add_user_permission,
 	get_doc_permissions,
-	has_permission,
 	remove_user_permission,
 )
 from frappe.utils import cstr, getdate, today, validate_email_address
@@ -442,6 +441,12 @@ def has_upload_permission(doc, ptype="read", user=None):
 def get_contact_details(employee: str) -> dict:
 	"""
 	Returns basic contact details for the given employee.
+
+	Email is selected based on the following priority:
+	1. Prefered Email
+	2. Company Email
+	3. Personal Email
+	4. User ID
 	"""
 	if not employee:
 		frappe.throw(msg=_("Employee is required"), title=_("Missing Parameter"))
