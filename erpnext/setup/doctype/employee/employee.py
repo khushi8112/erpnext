@@ -442,25 +442,43 @@ def has_upload_permission(doc, ptype="read", user=None):
 def get_contact_details(employee: str) -> dict:
 	"""
 	Returns basic contact details for the given employee.
-
-	- employee_name as contact_display
-	- prefered_email as contact_email
-	- cell_number as contact_mobile
-	- designation as contact_designation
-	- department as contact_department
-
-	:param employee: Employee docname
 	"""
 	if not employee:
 		frappe.throw(msg=_("Employee is required"), title=_("Missing Parameter"))
 
-	doc: Employee = frappe.get_doc("Employee", employee)
-	doc.check_permission()
+	frappe.has_permission("Employee", "read", employee, throw=True)
+
+	contact_data = frappe.db.get_value(
+		"Employee",
+		employee,
+		[
+			"employee_name",
+			"prefered_email",
+			"company_email",
+			"personal_email",
+			"user_id",
+			"cell_number",
+			"designation",
+			"department",
+		],
+		as_dict=True,
+	)
+
+	if not contact_data:
+		frappe.throw(msg=_("Employee {0} not found").format(employee), title=_("Not Found"))
+
+	# Email with priority
+	employee_email = (
+		contact_data.get("prefered_email")
+		or contact_data.get("company_email")
+		or contact_data.get("personal_email")
+		or contact_data.get("user_id")
+	)
 
 	return {
-		"contact_display": doc.get("employee_name"),
-		"contact_email": doc.get("prefered_email"),
-		"contact_mobile": doc.get("cell_number"),
-		"contact_designation": doc.get("designation"),
-		"contact_department": doc.get("department"),
+		"contact_display": contact_data.get("employee_name"),
+		"contact_email": employee_email,
+		"contact_mobile": contact_data.get("cell_number"),
+		"contact_designation": contact_data.get("designation"),
+		"contact_department": contact_data.get("department"),
 	}
