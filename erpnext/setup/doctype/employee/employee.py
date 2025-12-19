@@ -453,6 +453,10 @@ def get_contact_details(employee: str) -> dict:
 
 	frappe.has_permission("Employee", "read", employee, throw=True)
 
+	return _get_contact_details(employee)
+
+
+def _get_contact_details(employee: str) -> dict:
 	contact_data = frappe.db.get_value(
 		"Employee",
 		employee,
