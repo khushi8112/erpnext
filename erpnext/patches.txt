@@ -429,3 +429,4 @@ execute:frappe.db.set_single_value("Accounts Settings", "show_account_balance", 
 erpnext.patches.v16_0.update_currency_exchange_settings_for_frankfurter #2025-12-11
 erpnext.patches.v15_0.create_accounting_dimensions_in_advance_taxes_and_charges
 erpnext.patches.v16_0.set_ordered_qty_in_quotation_item
+erpnext.patches.v15_0.replace_http_with_https_in_sales_partner
