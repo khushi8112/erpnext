@@ -206,7 +206,11 @@ def get_data_when_grouped_by_invoice(columns, gross_profit_data, filters, group_
 
 		data.append(row)
 
-	total_gross_profit = total_base_amount - total_buying_amount
+	total_gross_profit = flt(
+		total_base_amount + abs(total_buying_amount)
+		if total_buying_amount < 0
+		else total_base_amount - total_buying_amount,
+	)
 	data.append(
 		frappe._dict(
 			{
@@ -218,7 +222,7 @@ def get_data_when_grouped_by_invoice(columns, gross_profit_data, filters, group_
 				"buying_amount": total_buying_amount,
 				"gross_profit": total_gross_profit,
 				"gross_profit_%": flt(
-					(total_gross_profit / total_base_amount) * 100.0,
+					(total_gross_profit / abs(total_base_amount)) * 100.0,
 					cint(frappe.db.get_default("currency_precision")) or 3,
 				)
 				if total_base_amount
@@ -251,9 +255,13 @@ def get_data_when_not_grouped_by_invoice(gross_profit_data, filters, group_wise_
 
 		data.append(row)
 
-	total_gross_profit = total_base_amount - total_buying_amount
+	total_gross_profit = flt(
+		total_base_amount + abs(total_buying_amount)
+		if total_buying_amount < 0
+		else total_base_amount - total_buying_amount,
+	)
 	currency_precision = cint(frappe.db.get_default("currency_precision")) or 3
-	gross_profit_percent = (total_gross_profit / total_base_amount * 100.0) if total_base_amount else 0
+	gross_profit_percent = (total_gross_profit / abs(total_base_amount) * 100.0) if total_base_amount else 0
 
 	total_row = {
 		group_columns[0]: "Total",
@@ -584,10 +592,15 @@ class GrossProfitGenerator:
 				base_amount += row.base_amount
 
 			# calculate gross profit
-			row.gross_profit = flt(row.base_amount - row.buying_amount, self.currency_precision)
+			row.gross_profit = flt(
+				row.base_amount + abs(row.buying_amount)
+				if row.buying_amount < 0
+				else row.base_amount - row.buying_amount,
+				self.currency_precision,
+			)
 			if row.base_amount:
 				row.gross_profit_percent = flt(
-					(row.gross_profit / row.base_amount) * 100.0,
+					(row.gross_profit / abs(row.base_amount)) * 100.0,
 					self.currency_precision,
 				)
 			else:
@@ -676,9 +689,14 @@ class GrossProfitGenerator:
 		return new_row
 
 	def set_average_gross_profit(self, new_row):
-		new_row.gross_profit = flt(new_row.base_amount - new_row.buying_amount, self.currency_precision)
+		new_row.gross_profit = flt(
+			new_row.base_amount + abs(new_row.buying_amount)
+			if new_row.buying_amount < 0
+			else new_row.base_amount - new_row.buying_amount,
+			self.currency_precision,
+		)
 		new_row.gross_profit_percent = (
-			flt(((new_row.gross_profit / new_row.base_amount) * 100.0), self.currency_precision)
+			flt(((new_row.gross_profit / abs(new_row.base_amount)) * 100.0), self.currency_precision)
 			if new_row.base_amount
 			else 0
 		)
