@@ -602,6 +602,11 @@ class calculate_taxes_and_totals:
 			else:
 				self.grand_total_diff = 0
 
+			# Apply rounding adjustment to grand_total_for_distributing_discount
+			# to prevent precision errors during discount distribution
+			if hasattr(self, "grand_total_for_distributing_discount") and not self.discount_amount_applied:
+				self.grand_total_for_distributing_discount += self.grand_total_diff
+
 	def calculate_totals(self):
 		grand_total_diff = self.grand_total_diff
 

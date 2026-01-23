@@ -584,6 +584,12 @@ erpnext.taxes_and_totals = class TaxesAndTotals extends erpnext.payments {
 				} else {
 					me.grand_total_diff = 0;
 				}
+
+				// Apply rounding adjustment to grand_total_for_distributing_discount
+				// to prevent precision errors during discount distribution
+				if (me.grand_total_for_distributing_discount && !me.discount_amount_applied) {
+					me.grand_total_for_distributing_discount += me.grand_total_diff;
+				}
 			}
 		}
 	}
