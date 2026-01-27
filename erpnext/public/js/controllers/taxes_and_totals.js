@@ -598,9 +598,20 @@ erpnext.taxes_and_totals = class TaxesAndTotals extends erpnext.payments {
 			? this.frm.doc["taxes"][tax_count - 1].total + grand_total_diff
 			: this.frm.doc.net_total);
 
-		if(["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "POS Invoice"].includes(this.frm.doc.doctype)) {
-			this.frm.doc.base_grand_total = (this.frm.doc.total_taxes_and_charges) ?
-				flt(this.frm.doc.grand_total * this.frm.doc.conversion_rate) : this.frm.doc.base_net_total;
+		// total taxes and charges is calculated before adjusting base grand total
+		this.frm.doc.total_taxes_and_charges = flt(
+			this.frm.doc.grand_total - this.frm.doc.net_total - grand_total_diff,
+			precision("total_taxes_and_charges")
+		);
+
+		if (
+			["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "POS Invoice"].includes(
+				this.frm.doc.doctype
+			)
+		) {
+			this.frm.doc.base_grand_total = this.frm.doc.total_taxes_and_charges
+				? flt(this.frm.doc.grand_total * this.frm.doc.conversion_rate)
+				: this.frm.doc.base_net_total;
 		} else {
 			// other charges added/deducted
 			this.frm.doc.taxes_and_charges_added = this.frm.doc.taxes_and_charges_deducted = 0.0;
@@ -625,11 +636,6 @@ erpnext.taxes_and_totals = class TaxesAndTotals extends erpnext.payments {
 			this.set_in_company_currency(this.frm.doc,
 				["taxes_and_charges_added", "taxes_and_charges_deducted"]);
 		}
-
-		this.frm.doc.total_taxes_and_charges = flt(this.frm.doc.grand_total - this.frm.doc.net_total
-			- grand_total_diff, precision("total_taxes_and_charges"));
-
-		this.set_in_company_currency(this.frm.doc, ["total_taxes_and_charges"]);
 
 		// Round grand total as per precision
 		frappe.model.round_floats_in(this.frm.doc, ["grand_total", "base_grand_total"]);
