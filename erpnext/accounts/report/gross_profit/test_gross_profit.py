@@ -690,3 +690,53 @@ class TestGrossProfit(FrappeTestCase):
 		self.assertEqual(total.buying_amount, 0.0)
 		self.assertEqual(total.gross_profit, -100.0)
 		self.assertEqual(total.get("gross_profit_%"), -100.0)
+
+	def test_sales_person_wise_gross_profit(self):
+		sales_person = make_sales_person("_Test Sales Person")
+
+		posting_date = get_first_day(nowdate())
+		qty = 10
+		rate = 100
+
+		sinv = self.create_sales_invoice(qty=qty, rate=rate, do_not_save=True, do_not_submit=True)
+		sinv.set_posting_time = 1
+		sinv.posting_date = posting_date
+		sinv.append(
+			"sales_team",
+			{
+				"sales_person": sales_person.name,
+				"allocated_percentage": 100,
+				"allocated_amount": 1000.0,
+				"commission_rate": 5,
+				"incentives": 5,
+			},
+		)
+		sinv.save().submit()
+
+		filters = frappe._dict(
+			company=self.company, from_date=posting_date, to_date=posting_date, group_by="Sales Person"
+		)
+
+		_, data = execute(filters=filters)
+		total = data[-1]
+
+		self.assertEqual(total.selling_amount, 1000.0)
+		self.assertEqual(total.buying_amount, 0.0)
+		self.assertEqual(total.gross_profit, 1000.0)
+		self.assertEqual(total.get("gross_profit_%"), 100.0)
+
+
+def make_sales_person(sales_person_name="_Test Sales Person"):
+	if not frappe.db.exists("Sales Person", {"sales_person_name": sales_person_name}):
+		sales_person_doc = frappe.get_doc(
+			{
+				"doctype": "Sales Person",
+				"is_group": 0,
+				"parent_sales_person": "Sales Team",
+				"sales_person_name": sales_person_name,
+			}
+		).insert(ignore_permissions=True)
+	else:
+		sales_person_doc = frappe.get_doc("Sales Person", {"sales_person_name": sales_person_name})
+
+	return sales_person_doc
