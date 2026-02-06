@@ -1671,11 +1671,7 @@
  "idx": 105,
  "is_submittable": 1,
  "links": [],
-<<<<<<< HEAD
- "modified": "2025-07-28 12:14:29.760988",
-=======
  "modified": "2026-02-06 11:06:16.092658",
->>>>>>> 1a22e3cb61 (fix: enabling skip delivery option for order type maintenance)
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order",
