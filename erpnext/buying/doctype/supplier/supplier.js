@@ -139,14 +139,6 @@ frappe.ui.form.on("Supplier", {
 			// indicators
 			erpnext.utils.set_party_dashboard_indicators(frm);
 		}
-
-		frm.set_query("supplier_group", () => {
-			return {
-				filters: {
-					is_group: 0,
-				},
-			};
-		});
 	},
 	get_supplier_group_details: function (frm) {
 		frappe.call({

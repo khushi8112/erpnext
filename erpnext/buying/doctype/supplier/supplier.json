@@ -165,6 +165,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Supplier Group",
+   "link_filters": "[[\"Supplier Group\",\"is_group\",\"=\",0]]",
    "oldfieldname": "supplier_type",
    "oldfieldtype": "Link",
    "options": "Supplier Group"
@@ -485,7 +486,11 @@
    "link_fieldname": "party"
   }
  ],
+<<<<<<< HEAD
  "modified": "2024-05-08 18:02:57.342931",
+=======
+ "modified": "2026-02-06 12:58:01.398824",
+>>>>>>> cfdc554a19 (fix(buying): add supplier group link filters in field level)
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Supplier",
