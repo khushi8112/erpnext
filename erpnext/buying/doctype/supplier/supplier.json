@@ -486,11 +486,7 @@
    "link_fieldname": "party"
   }
  ],
-<<<<<<< HEAD
- "modified": "2024-05-08 18:02:57.342931",
-=======
  "modified": "2026-02-06 12:58:01.398824",
->>>>>>> cfdc554a19 (fix(buying): add supplier group link filters in field level)
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Supplier",
