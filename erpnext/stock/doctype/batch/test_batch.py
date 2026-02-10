@@ -141,7 +141,7 @@ class TestBatch(FrappeTestCase):
 		from erpnext.stock.doctype.stock_reconciliation.test_stock_reconciliation import (
 			create_batch_item_with_batch,
 		)
-		
+
 		session_user = frappe.session.user
 
 		try:
