@@ -83,6 +83,7 @@ def get_result(filters, tds_docs, tds_accounts, tax_category_map, journal_entry_
 					# back calculate total amount from rate and tax_amount
 					base_total = min(flt(tax_amount / (rate / 100), precision=precision), values[0])
 					total_amount = grand_total = base_total
+					base_tax_withholding_net_total = total_amount
 
 				else:
 					if tax_amount and rate:
