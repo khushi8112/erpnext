@@ -51,7 +51,7 @@ def get_result(filters, tds_docs, tds_accounts, tax_category_map, journal_entry_
 	entries = {}
 	for name, details in gle_map.items():
 		for entry in details:
-			tax_amount, total_amount, grand_total, base_total = 0, 0, 0, 0
+			tax_amount, total_amount, grand_total, base_total, base_tax_withholding_net_total = 0, 0, 0, 0, 0
 			tax_withholding_category, rate = None, None
 			bill_no, bill_date = "", ""
 			party = entry.party or entry.against
@@ -93,12 +93,16 @@ def get_result(filters, tds_docs, tds_accounts, tax_category_map, journal_entry_
 
 					grand_total = values[1]
 					base_total = values[2]
+					base_tax_withholding_net_total = total_amount
 
 					if voucher_type == "Purchase Invoice":
+						base_tax_withholding_net_total = values[0]
 						bill_no = values[3]
 						bill_date = values[4]
+
 			else:
 				total_amount += entry.credit
+				base_tax_withholding_net_total = total_amount
 
 			if tax_amount:
 				if party_map.get(party, {}).get("party_type") == "Supplier":
@@ -125,6 +129,7 @@ def get_result(filters, tds_docs, tds_accounts, tax_category_map, journal_entry_
 						"rate": rate,
 						"total_amount": total_amount,
 						"grand_total": grand_total,
+						"base_tax_withholding_net_total": base_tax_withholding_net_total,
 						"base_total": base_total,
 						"tax_amount": tax_amount,
 						"transaction_date": posting_date,
@@ -250,6 +255,12 @@ def get_columns(filters):
 				"fieldname": "rate",
 				"fieldtype": "Percent",
 				"width": 60,
+			},
+			{
+				"label": _("Tax Withholding Net Total"),
+				"fieldname": "base_tax_withholding_net_total",
+				"fieldtype": "Float",
+				"width": 150,
 			},
 			{
 				"label": _("Taxable Amount"),

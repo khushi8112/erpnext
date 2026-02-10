@@ -35,9 +35,9 @@ class TestTaxWithholdingDetails(AccountsTestMixin, FrappeTestCase):
 		result = execute(filters)[1]
 		expected_values = [
 			# Check for JV totals using back calculation logic
-			[jv.name, "TCS", 0.075, -10000.0, -7.5, -10000.0],
-			[pe.name, "TCS", 0.075, 2550, 0.53, 2550.53],
-			[si.name, "TCS", 0.075, 1000, 0.52, 1000.52],
+			[jv.name, "TCS", 0.075, -10000.0, -10000.0, -7.5, -10000.0],
+			[pe.name, "TCS", 0.075, 2550, 2550, 0.53, 2550.53],
+			[si.name, "TCS", 0.075, 1000, 1000, 0.52, 1000.52],
 		]
 		self.check_expected_values(result, expected_values)
 
@@ -55,8 +55,8 @@ class TestTaxWithholdingDetails(AccountsTestMixin, FrappeTestCase):
 			frappe._dict(company="_Test Company", party_type="Supplier", from_date=today(), to_date=today())
 		)[1]
 		expected_values = [
-			[inv_1.name, "TDS - 1", 10, 5000, 500, 5500],
-			[inv_2.name, "TDS - 2", 20, 5000, 1000, 6000],
+			[inv_1.name, "TDS - 1", 10, 5000, 5000, 500, 5500],
+			[inv_2.name, "TDS - 2", 20, 5000, 5000, 1000, 6000],
 		]
 		self.check_expected_values(result, expected_values)
 
@@ -107,8 +107,8 @@ class TestTaxWithholdingDetails(AccountsTestMixin, FrappeTestCase):
 		)[1]
 
 		expected_values = [
-			[inv_1.name, "TDS - 3", 10.0, 5000, 500, 4500],
-			[inv_2.name, "TDS - 3", 20.0, 5000, 1000, 4000],
+			[inv_1.name, "TDS - 3", 10.0, 5000, 5000, 500, 4500],
+			[inv_2.name, "TDS - 3", 20.0, 5000, 5000, 1000, 4000],
 		]
 		self.check_expected_values(result, expected_values)
 
@@ -120,6 +120,7 @@ class TestTaxWithholdingDetails(AccountsTestMixin, FrappeTestCase):
 				voucher.ref_no,
 				voucher.section_code,
 				voucher.rate,
+				voucher.base_tax_withholding_net_total,
 				voucher.base_total,
 				voucher.tax_amount,
 				voucher.grand_total,
