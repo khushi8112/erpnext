@@ -902,15 +902,27 @@ class TestMaterialRequest(FrappeTestCase):
 		import json
 
 		from erpnext.stock.doctype.pick_list.pick_list import create_stock_entry
+		from erpnext.stock.doctype.stock_entry.stock_entry_utils import make_stock_entry
 
-		mr = make_material_request(material_request_type="Material Transfer")
+		new_item = create_item("_Test Pick List Item", is_stock_item=1)
+		item_code = new_item.name
+
+		make_stock_entry(
+			item_code=item_code,
+			target="_Test Warehouse - _TC",
+			qty=10,
+			do_not_save=False,
+			do_not_submit=False,
+		)
+
+		mr = make_material_request(item_code=item_code, material_request_type="Material Transfer")
 		pl = create_pick_list(mr.name)
 		pl.save()
 		pl.locations[0].qty = 5
 		pl.locations[0].stock_qty = 5
 		pl.submit()
 
-		to_warehouse = create_warehouse("Test To Warehouse")
+		to_warehouse = create_warehouse("_Test Warehouse - _TC")
 
 		se_data = create_stock_entry(json.dumps(pl.as_dict()))
 		se = frappe.get_doc(se_data)
