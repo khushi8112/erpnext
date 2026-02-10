@@ -970,6 +970,19 @@ class TestMaterialRequest(FrappeTestCase):
 
 		self.assertRaises(frappe.ValidationError, end_transit_2.submit)
 
+	def test_make_stock_entry_material_issue_warehouse_mapping(self):
+		"""Test to ensure while making stock entry from material request of type Material Issue, warehouse is mapped correctly"""
+		mr = make_material_request(material_request_type="Material Issue", do_not_submit=True)
+		mr.set_warehouse = "_Test Warehouse - _TC"
+		mr.save()
+		mr.submit()
+
+		se = make_stock_entry(mr.name)
+		self.assertEqual(se.from_warehouse, "_Test Warehouse - _TC")
+		self.assertIsNone(se.to_warehouse)
+		se.save()
+		se.submit()
+
 
 def get_in_transit_warehouse(company):
 	if not frappe.db.exists("Warehouse Type", "Transit"):
