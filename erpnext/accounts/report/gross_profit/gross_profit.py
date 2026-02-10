@@ -892,7 +892,9 @@ class GrossProfitGenerator:
 			(SalesInvoice.is_return == 1) & SalesInvoice.return_against.isnotnull()
 		)
 		if self.vouchers_to_ignore:
-			ret_invoice_query = base_query.where(SalesInvoice.return_against.notin(self.vouchers_to_ignore))
+			ret_invoice_query = ret_invoice_query.where(
+				SalesInvoice.return_against.notin(self.vouchers_to_ignore)
+			)
 
 		self.si_list += ret_invoice_query.run(as_dict=True)
 
@@ -912,7 +914,7 @@ class GrossProfitGenerator:
 			.where((SalesInvoice.docstatus == 1) & (SalesInvoice.is_opening != "Yes"))
 		)
 
-		query = self.apply_common_filters(query, SalesInvoice, SalesInvoiceItem, SalesTeam)
+		query = self.apply_common_filters(query, SalesInvoice, SalesInvoiceItem, SalesTeam, Item)
 
 		query = query.select(
 			SalesInvoiceItem.parenttype,
@@ -976,7 +978,7 @@ class GrossProfitGenerator:
 
 		return query
 
-	def apply_common_filters(self, query, SalesInvoice, SalesInvoiceItem, SalesTeam):
+	def apply_common_filters(self, query, SalesInvoice, SalesInvoiceItem, SalesTeam, Item):
 		if self.filters.company:
 			query = query.where(SalesInvoice.company == self.filters.company)
 
@@ -987,7 +989,7 @@ class GrossProfitGenerator:
 			query = query.where(SalesInvoice.posting_date <= self.filters.to_date)
 
 		if self.filters.item_group:
-			query = query.where(get_item_group_condition(self.filters.item_group))
+			query = query.where(get_item_group_condition(self.filters.item_group, Item))
 
 		if self.filters.sales_person:
 			query = query.where(
