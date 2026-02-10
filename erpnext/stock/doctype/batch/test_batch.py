@@ -141,14 +141,10 @@ class TestBatch(FrappeTestCase):
 		from erpnext.stock.doctype.stock_reconciliation.test_stock_reconciliation import (
 			create_batch_item_with_batch,
 		)
-
-		invoice_type = frappe.db.get_single_value("POS Settings", "invoice_type")
+		
 		session_user = frappe.session.user
 
 		try:
-			# Set invoice type to POS Invoice
-			frappe.db.set_single_value("POS Settings", "invoice_type", "POS Invoice")
-
 			# Create batch item
 			create_batch_item_with_batch("_Test BATCH ITEM", "TestBatch-RS 02")
 
@@ -198,8 +194,6 @@ class TestBatch(FrappeTestCase):
 			self.assertEqual(row.qty, 30)
 
 		finally:
-			# Set invoice type to Sales Invoice
-			frappe.db.set_single_value("POS Settings", "invoice_type", invoice_type)
 			# Set user to session user
 			frappe.set_user(session_user)
 
