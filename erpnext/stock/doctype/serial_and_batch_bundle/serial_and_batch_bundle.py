@@ -15,6 +15,7 @@ from frappe.utils import (
 	cint,
 	cstr,
 	flt,
+	format_datetime,
 	get_datetime,
 	get_link_to_form,
 	getdate,
@@ -1426,22 +1427,33 @@ class SerialandBatchBundle(Document):
 			if flt(available_qty, precision) < 0:
 				self.throw_negative_batch(d.batch_no, available_qty, precision)
 
-	def throw_negative_batch(self, batch_no, available_qty, precision):
+	def throw_negative_batch(self, batch_no, available_qty, precision, posting_datetime=None):
 		from erpnext.stock.stock_ledger import NegativeStockError
 
 		if frappe.db.get_single_value("Stock Settings", "allow_negative_stock_for_batch"):
 			return
 
+		date_msg = ""
+		if posting_datetime:
+			date_msg = " " + _("as of {0}").format(format_datetime(posting_datetime))
+
+		msg = _(
+			"""
+			The Batch {0} of an item {1} has negative stock in the warehouse {2}{3}.
+			Please add a stock quantity of {4} to proceed with this entry.
+			If it is not possible to make an adjustment entry, please enable 'Allow Negative Stock for Batch' in Stock Settings to proceed.
+			However, enabling this setting may lead to negative stock in the system.
+			So please ensure the stock levels are adjusted as soon as possible to maintain the correct valuation rate."""
+		).format(
+			bold(batch_no),
+			bold(self.item_code),
+			bold(self.warehouse),
+			date_msg,
+			bold(abs(flt(available_qty, precision))),
+		)
+
 		frappe.throw(
-			_(
-				"""
-			The Batch {0} of an item {1} has negative stock in the warehouse {2}. Please add a stock quantity of {3} to proceed with this entry."""
-			).format(
-				bold(batch_no),
-				bold(self.item_code),
-				bold(self.warehouse),
-				bold(abs(flt(available_qty, precision))),
-			),
+			msg,
 			title=_("Negative Stock Error"),
 			exc=NegativeStockError,
 		)
@@ -1464,7 +1476,9 @@ class SerialandBatchBundle(Document):
 				available_qty[row.batch_no] = flt(row.qty)
 
 			if flt(available_qty[row.batch_no], precision) < 0:
-				self.throw_negative_batch(row.batch_no, available_qty[row.batch_no], precision)
+				self.throw_negative_batch(
+					row.batch_no, available_qty[row.batch_no], precision, row.posting_datetime
+				)
 
 		return available_qty
 
