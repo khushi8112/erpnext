@@ -1512,17 +1512,17 @@ class SerialandBatchBundle(Document):
 	def get_available_qty_from_sabb(self):
 		batches = [d.batch_no for d in self.entries if d.batch_no]
 
-		parent = frappe.qb.DocType("Serial and Batch Bundle")
+		parent = frappe.qb.DocType("Stock Ledger Entry")
 		child = frappe.qb.DocType("Serial and Batch Entry")
 
 		query = (
 			frappe.qb.from_(parent)
 			.inner_join(child)
-			.on(parent.name == child.parent)
+			.on(parent.serial_and_batch_bundle == child.parent)
 			.select(
 				child.batch_no,
 				child.qty,
-				CombineDatetime(parent.posting_date, parent.posting_time).as_("posting_datetime"),
+				parent.posting_datetime,
 				parent.creation,
 			)
 			.where(
@@ -1531,12 +1531,9 @@ class SerialandBatchBundle(Document):
 				& (child.batch_no.isin(batches))
 				& (parent.docstatus == 1)
 				& (parent.is_cancelled == 0)
-				& (parent.type_of_transaction.isin(["Inward", "Outward"]))
 			)
 			.for_update()
 		)
-
-		query = query.where(parent.voucher_type != "Pick List")
 
 		return query.run(as_dict=True)
 
