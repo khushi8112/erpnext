@@ -1541,6 +1541,9 @@ class SerialandBatchBundle(Document):
 		return query.run(as_dict=True)
 
 	def validate_voucher_no_docstatus(self):
+		if self.is_cancelled:
+			return
+
 		if self.voucher_type == "POS Invoice":
 			return
 
