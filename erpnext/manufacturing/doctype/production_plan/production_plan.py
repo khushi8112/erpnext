@@ -790,6 +790,8 @@ class ProductionPlan(Document):
 			"stock_uom",
 			"bom_level",
 			"schedule_date",
+			"sales_order",
+			"sales_order_item",
 		]:
 			if row.get(field):
 				wo_data[field] = row.get(field)
@@ -829,6 +831,8 @@ class ProductionPlan(Document):
 					"qty",
 					"description",
 					"production_plan_item",
+					"sales_order",
+					"sales_order_item",
 				]:
 					po_data[field] = row.get(field)
 
@@ -1014,6 +1018,10 @@ class ProductionPlan(Document):
 
 			if not is_group_warehouse:
 				data.fg_warehouse = self.sub_assembly_warehouse
+
+			if not self.combine_sub_items:
+				data.sales_order = row.sales_order
+				data.sales_order_item = row.sales_order_item
 
 	def set_default_supplier_for_subcontracting_order(self):
 		items = [
