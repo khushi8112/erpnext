@@ -804,12 +804,19 @@ def validate_against_pcv(is_opening, posting_date, company):
 			title=_("Invalid Opening Entry"),
 		)
 
-	last_pcv_date = frappe.db.get_value(
-		"Period Closing Voucher", {"docstatus": 1, "company": company}, "max(period_end_date)"
-	)
+	# Local import so you don't have to touch file-level imports
+	from frappe.query_builder.functions import Max
+
+	pcv = frappe.qb.DocType("Period Closing Voucher")
+
+	last_pcv_date = (
+		frappe.qb.from_(pcv)
+		.select(Max(pcv.period_end_date))
+		.where((pcv.docstatus == 1) & (pcv.company == company))
+	).run(pluck=True)[0]
 
 	if last_pcv_date and getdate(posting_date) <= getdate(last_pcv_date):
-		message = _("Books have been closed till the period ending on {0}").format(formatdate(last_pcv_date))
+		message = _("Books have been closed till the period ending on {0}.").format(formatdate(last_pcv_date))
 		message += "</br >"
 		message += _("You cannot create/amend any accounting entries till this date.")
 		frappe.throw(message, title=_("Period Closed"))
