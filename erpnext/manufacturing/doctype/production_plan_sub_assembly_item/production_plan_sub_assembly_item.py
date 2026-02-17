@@ -33,6 +33,8 @@ class ProductionPlanSubAssemblyItem(Document):
 		purchase_order: DF.Link | None
 		qty: DF.Float
 		received_qty: DF.Float
+		sales_order: DF.Link | None
+		sales_order_item: DF.Data | None
 		schedule_date: DF.Datetime | None
 		stock_uom: DF.Link | None
 		supplier: DF.Link | None
