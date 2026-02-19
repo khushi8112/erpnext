@@ -1607,8 +1607,8 @@ def close_work_order(work_order, status):
 				)
 			)
 
-	work_order.on_close_or_cancel()
 	work_order.update_status(status)
+	work_order.on_close_or_cancel()
 	frappe.msgprint(_("Work Order has been {0}").format(status))
 	work_order.notify_update()
 	return work_order.status
