@@ -4044,7 +4044,7 @@ def update_child_qty_rate(parent_doctype, trans_items, parent_doctype_name, chil
 			child_item.idx = len(parent.items) + 1
 			child_item.insert()
 		else:
-			parent.save()
+			child.save(ignore_permissions=True)
 
 	parent.reload()
 	parent.flags.ignore_validate_update_after_submit = True
