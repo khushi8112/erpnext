@@ -997,12 +997,11 @@ def validate_picked_materials(item_code, required_qty, locations, picked_item_de
 	if remaining_qty > 0:
 		if picked_item_details:
 			frappe.msgprint(
-				_("{0} units of Item {1} is picked in another Pick List.").format(
-					remaining_qty, get_link_to_form("Item", item_code)
-				),
+				_(
+					"{0} units of Item {1} is not available in any of the warehouses. Other Pick Lists exist for this item."
+				).format(remaining_qty, get_link_to_form("Item", item_code)),
 				title=_("Already Picked"),
 			)
-
 		else:
 			frappe.msgprint(
 				_("{0} units of Item {1} is not available in any of the warehouses.").format(
