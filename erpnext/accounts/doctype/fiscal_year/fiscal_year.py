@@ -33,24 +33,6 @@ class FiscalYear(Document):
 		self.validate_dates()
 		self.validate_overlap()
 
-		if not self.is_new():
-			year_start_end_dates = frappe.db.sql(
-				"""select year_start_date, year_end_date
-				from `tabFiscal Year` where name=%s""",
-				(self.name),
-			)
-
-			if year_start_end_dates:
-				if (
-					getdate(self.year_start_date) != year_start_end_dates[0][0]
-					or getdate(self.year_end_date) != year_start_end_dates[0][1]
-				):
-					frappe.throw(
-						_(
-							"Cannot change Fiscal Year Start Date and Fiscal Year End Date once the Fiscal Year is saved."
-						)
-					)
-
 	def validate_dates(self):
 		self.validate_from_to_dates("year_start_date", "year_end_date")
 		if self.is_short_year:
@@ -66,28 +48,20 @@ class FiscalYear(Document):
 				frappe.exceptions.InvalidDates,
 			)
 
-	def on_update(self):
-		check_duplicate_fiscal_year(self)
-		frappe.cache().delete_value("fiscal_years")
-
-	def on_trash(self):
-		frappe.cache().delete_value("fiscal_years")
-
 	def validate_overlap(self):
-		existing_fiscal_years = frappe.db.sql(
-			"""select name from `tabFiscal Year`
-			where (
-				(%(year_start_date)s between year_start_date and year_end_date)
-				or (%(year_end_date)s between year_start_date and year_end_date)
-				or (year_start_date between %(year_start_date)s and %(year_end_date)s)
-				or (year_end_date between %(year_start_date)s and %(year_end_date)s)
-			) and name!=%(name)s""",
-			{
-				"year_start_date": self.year_start_date,
-				"year_end_date": self.year_end_date,
-				"name": self.name or "No Name",
-			},
-			as_dict=True,
+		fy = frappe.qb.DocType("Fiscal Year")
+
+		name = self.name or self.year
+
+		existing_fiscal_years = (
+			frappe.qb.from_(fy)
+			.select(fy.name)
+			.where(
+				(fy.year_start_date <= self.year_end_date)
+				& (fy.year_end_date >= self.year_start_date)
+				& (fy.name != name)
+			)
+			.run(as_dict=True)
 		)
 
 		if existing_fiscal_years:
@@ -110,12 +84,13 @@ class FiscalYear(Document):
 					frappe.throw(
 						_(
 							"Year start date or end date is overlapping with {0}. To avoid please set company"
-						).format(existing.name),
+						).format(frappe.get_desk_link("Fiscal Year", existing.name, open_in_new_tab=True)),
 						frappe.NameError,
 					)
 
 
 @frappe.whitelist()
+<<<<<<< HEAD
 def check_duplicate_fiscal_year(doc):
 	year_start_end_dates = frappe.db.sql(
 		"""select name, year_start_date, year_end_date from `tabFiscal Year` where name!=%s""",
@@ -133,6 +108,8 @@ def check_duplicate_fiscal_year(doc):
 
 
 @frappe.whitelist()
+=======
+>>>>>>> 74ac28fc70 (refactor: `Fiscal Year` DocType cleanup)
 def auto_create_fiscal_year():
 	for d in frappe.db.sql(
 		"""select name from `tabFiscal Year` where year_end_date = date_add(current_date, interval 3 day)"""
