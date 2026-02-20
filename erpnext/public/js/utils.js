@@ -671,7 +671,7 @@ erpnext.utils.update_child_items = function (opts) {
 					filters: filters,
 				};
 			},
-			onchange: function () {
+			change: function () {
 				const me = this;
 
 				frm.call({
