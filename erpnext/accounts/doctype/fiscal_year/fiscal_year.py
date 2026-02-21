@@ -89,30 +89,6 @@ class FiscalYear(Document):
 					)
 
 
-<<<<<<< HEAD
-@frappe.whitelist()
-<<<<<<< HEAD
-def check_duplicate_fiscal_year(doc):
-	year_start_end_dates = frappe.db.sql(
-		"""select name, year_start_date, year_end_date from `tabFiscal Year` where name!=%s""",
-		(doc.name),
-	)
-	for fiscal_year, ysd, yed in year_start_end_dates:
-		if (getdate(doc.year_start_date) == ysd and getdate(doc.year_end_date) == yed) and (
-			not frappe.flags.in_test
-		):
-			frappe.throw(
-				_(
-					"Fiscal Year Start Date and Fiscal Year End Date are already set in Fiscal Year {0}"
-				).format(fiscal_year)
-			)
-
-
-@frappe.whitelist()
-=======
->>>>>>> 74ac28fc70 (refactor: `Fiscal Year` DocType cleanup)
-=======
->>>>>>> 4c76786ce4 (fix(`fiscal_year`): `Fiscal Year` auto-generation and notification)
 def auto_create_fiscal_year():
 	fy = frappe.qb.DocType("Fiscal Year")
 
