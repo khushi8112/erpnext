@@ -1101,7 +1101,6 @@ def create_pos_invoice(**args):
 
 	pos_inv = frappe.new_doc("POS Invoice")
 	pos_inv.update(args)
-	pos_inv.update_stock = 1
 	pos_inv.is_pos = 1
 	pos_inv.pos_profile = args.pos_profile or pos_profile.name
 

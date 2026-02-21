@@ -25,7 +25,6 @@
   "validate_stock_on_save",
   "print_receipt_on_order_complete",
   "column_break_16",
-  "update_stock",
   "ignore_pricing_rule",
   "allow_rate_change",
   "allow_discount_change",
@@ -297,7 +296,6 @@
    "options": "Print Format"
   },
   {
-   "depends_on": "update_stock",
    "fieldname": "warehouse",
    "fieldtype": "Link",
    "label": "Warehouse",
@@ -311,14 +309,6 @@
    "fieldname": "ignore_pricing_rule",
    "fieldtype": "Check",
    "label": "Ignore Pricing Rule"
-  },
-  {
-   "default": "1",
-   "fieldname": "update_stock",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Update Stock",
-   "read_only": 1
   },
   {
    "default": "0",
@@ -432,7 +422,7 @@
    "link_fieldname": "pos_profile"
   }
  ],
- "modified": "2025-04-14 15:58:20.497426",
+ "modified": "2026-02-22 04:17:03.308876",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "POS Profile",

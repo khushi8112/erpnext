@@ -60,7 +60,6 @@
   "sec_warehouse",
   "set_warehouse",
   "items_section",
-  "update_stock",
   "scan_barcode",
   "last_scanned_warehouse",
   "items",
@@ -574,7 +573,6 @@
    "label": "Warehouse"
   },
   {
-   "depends_on": "update_stock",
    "fieldname": "set_warehouse",
    "fieldtype": "Link",
    "label": "Source Warehouse",
@@ -587,15 +585,6 @@
    "label": "Items",
    "oldfieldtype": "Section Break",
    "options": "fa fa-shopping-cart"
-  },
-  {
-   "default": "0",
-   "fieldname": "update_stock",
-   "fieldtype": "Check",
-   "label": "Update Stock",
-   "oldfieldname": "update_stock",
-   "oldfieldtype": "Check",
-   "print_hide": 1
   },
   {
    "fieldname": "scan_barcode",
@@ -1582,7 +1571,7 @@
  "icon": "fa fa-file-text",
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-04 22:22:31.471752",
+ "modified": "2026-02-22 04:18:50.691218",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "POS Invoice",
@@ -1627,6 +1616,7 @@
    "role": "All"
   }
  ],
+ "row_format": "Dynamic",
  "search_fields": "posting_date, due_date, customer, base_grand_total, outstanding_amount",
  "show_name_in_global_search": 1,
  "sort_field": "modified",

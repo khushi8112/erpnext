@@ -146,6 +146,7 @@ class POSInvoiceMergeLog(Document):
 
 		sales_invoice.is_consolidated = 1
 		sales_invoice.set_posting_time = 1
+		sales_invoice.update_stock = 1
 
 		if not sales_invoice.posting_date:
 			sales_invoice.posting_date = getdate(self.posting_date)
@@ -174,6 +175,7 @@ class POSInvoiceMergeLog(Document):
 
 			credit_note.is_consolidated = 1
 			credit_note.set_posting_time = 1
+			credit_note.update_stock = 1
 			credit_note.posting_date = getdate(self.posting_date)
 			credit_note.posting_time = get_time(self.posting_time)
 			# TODO: return could be against multiple sales invoice which could also have been consolidated?

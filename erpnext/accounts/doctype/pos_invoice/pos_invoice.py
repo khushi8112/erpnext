@@ -183,7 +183,6 @@ class POSInvoice(SalesInvoice):
 		total_taxes_and_charges: DF.Currency
 		update_billed_amount_in_delivery_note: DF.Check
 		update_billed_amount_in_sales_order: DF.Check
-		update_stock: DF.Check
 		write_off_account: DF.Link | None
 		write_off_amount: DF.Currency
 		write_off_cost_center: DF.Link | None
@@ -652,7 +651,6 @@ class POSInvoice(SalesInvoice):
 				"tax_category",
 				"ignore_pricing_rule",
 				"company_address",
-				"update_stock",
 			):
 				if not for_validate:
 					self.set(fieldname, profile.get(fieldname))
