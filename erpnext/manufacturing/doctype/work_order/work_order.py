@@ -1173,6 +1173,7 @@ class WorkOrder(Document):
 							"operation": item.operation or operation,
 							"item_code": item.item_code,
 							"item_name": item.item_name,
+							"stock_uom": item.stock_uom,
 							"description": item.description,
 							"allow_alternative_item": item.allow_alternative_item,
 							"required_qty": item.qty,
@@ -1197,7 +1198,7 @@ class WorkOrder(Document):
 			.select(
 				ste_child.item_code,
 				ste_child.original_item,
-				fn.Sum(ste_child.qty).as_("qty"),
+				fn.Sum(ste_child.transfer_qty).as_("qty"),
 			)
 			.where(
 				(ste.docstatus == 1)
@@ -1227,7 +1228,7 @@ class WorkOrder(Document):
 			.select(
 				ste_child.item_code,
 				ste_child.original_item,
-				fn.Sum(ste_child.qty).as_("qty"),
+				fn.Sum(ste_child.transfer_qty).as_("qty"),
 			)
 			.where(
 				(ste.docstatus == 1)
