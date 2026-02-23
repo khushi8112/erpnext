@@ -358,7 +358,7 @@ class WorkOrder(Document):
 			if status != self.status:
 				self.db_set("status", status)
 
-			self.update_required_items()
+		self.update_required_items()
 
 		return status or self.status
 
