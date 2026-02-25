@@ -455,7 +455,7 @@
   },
   {
    "default": "0",
-   "description": "If enabled, the item rate won't adjust to the valuation rate during internal transfers, but accounting will still use the valuation rate.",
+   "description": "If enabled, the item rate won't adjust to the valuation rate during internal transfers, but accounting will still use the valuation rate. This will allow the user to specify a different rate for printing or taxation purposes.",
    "fieldname": "allow_internal_transfer_at_arms_length_price",
    "fieldtype": "Check",
    "label": "Allow Internal Transfers at Arm's Length Price"
@@ -553,7 +553,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-02-16 10:36:59.921491",
+ "modified": "2026-02-25 09:56:34.105949",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Settings",
