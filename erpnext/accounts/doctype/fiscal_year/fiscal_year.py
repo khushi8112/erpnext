@@ -33,6 +33,12 @@ class FiscalYear(Document):
 		self.validate_dates()
 		self.validate_overlap()
 
+	def on_update(self):
+		frappe.cache().delete_key("fiscal_years")
+
+	def on_trash(self):
+		frappe.cache().delete_key("fiscal_years")
+
 	def validate_dates(self):
 		self.validate_from_to_dates("year_start_date", "year_end_date")
 		if self.is_short_year:
