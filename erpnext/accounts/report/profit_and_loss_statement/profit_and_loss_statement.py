@@ -62,7 +62,7 @@ def execute(filters=None):
 	currency = filters.presentation_currency or frappe.get_cached_value(
 		"Company", filters.company, "default_currency"
 	)
-	chart = get_chart_data(filters, columns, income, expense, net_profit_loss, currency)
+	chart = get_chart_data(filters, period_list, income, expense, net_profit_loss, currency)
 
 	report_summary, primitive_summary = get_report_summary(
 		period_list, filters.periodicity, income, expense, net_profit_loss, currency, filters
@@ -158,18 +158,20 @@ def get_net_profit_loss(income, expense, period_list, company, currency=None, co
 		return net_profit_loss
 
 
-def get_chart_data(filters, columns, income, expense, net_profit_loss, currency):
-	labels = [d.get("label") for d in columns[2:]]
+def get_chart_data(filters, chart_columns, income, expense, net_profit_loss, currency):
+	labels = [col.get("label") for col in chart_columns]
 
 	income_data, expense_data, net_profit = [], [], []
 
-	for p in columns[2:]:
+	for col in chart_columns:
+		key = col.get("key") or col.get("fieldname")
+
 		if income:
-			income_data.append(income[-2].get(p.get("fieldname")))
+			income_data.append(income[-2].get(key))
 		if expense:
-			expense_data.append(expense[-2].get(p.get("fieldname")))
+			expense_data.append(expense[-2].get(key))
 		if net_profit_loss:
-			net_profit.append(net_profit_loss.get(p.get("fieldname")))
+			net_profit.append(net_profit_loss.get(key))
 
 	datasets = []
 	if income_data:
