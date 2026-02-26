@@ -40,7 +40,6 @@
   "set_zero_rate_for_expired_batch"
 =======
   "set_zero_rate_for_expired_batch",
-  "automatically_fetch_payment_terms_from_quotation",
   "section_break_avhb",
   "enable_utm",
   "experimental_section",
@@ -268,6 +267,7 @@
    "fieldname": "enable_utm",
    "fieldtype": "Check",
    "label": "Enable UTM"
+<<<<<<< HEAD
   },
   {
    "default": "1",
@@ -275,6 +275,8 @@
    "fieldtype": "Check",
    "label": "Automatically Fetch Payment Terms from Quotation"
 >>>>>>> 70b401e610 (feat(selling-settings): add checkbox to recalculate payment date)
+=======
+>>>>>>> 99ed1c34f3 (fix: fetch payment terms from quotation)
   }
  ],
  "grid_page_length": 50,
@@ -284,10 +286,14 @@
  "issingle": 1,
  "links": [],
 <<<<<<< HEAD
+<<<<<<< HEAD
  "modified": "2026-01-24 00:04:33.105916",
 =======
  "modified": "2026-02-18 21:25:56.307468",
 >>>>>>> 8b9e02fd44 (fix: set default to 1)
+=======
+ "modified": "2026-02-27 00:47:46.003305",
+>>>>>>> 99ed1c34f3 (fix: fetch payment terms from quotation)
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Selling Settings",
