@@ -211,7 +211,9 @@ class StockBalanceReport:
 			if row.count != 1:
 				continue
 
-			current_qty = frappe.db.get_value("Stock Reconciliation Item", row.voucher_detail_no, "current_qty")
+			current_qty = frappe.db.get_value(
+				"Stock Reconciliation Item", row.voucher_detail_no, "current_qty"
+			)
 			self.stock_reco_voucher_wise_count[row.voucher_detail_no] = current_qty
 
 	def get_sre_reserved_qty_details(self) -> dict:
@@ -235,8 +237,8 @@ class StockBalanceReport:
 			not entry.batch_no or entry.serial_no or entry.serial_and_batch_bundle
 		):
 			if entry.serial_no and entry.voucher_detail_no in self.stock_reco_voucher_wise_count:
-				qty_dict.bal_qty = 0.0
 				qty_dict.opening_qty -= self.stock_reco_voucher_wise_count.get(entry.voucher_detail_no, 0)
+				qty_dict.bal_qty = 0.0
 				qty_diff = flt(entry.actual_qty)
 			else:
 				qty_diff = flt(entry.qty_after_transaction) - flt(qty_dict.bal_qty)
