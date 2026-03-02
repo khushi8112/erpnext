@@ -67,12 +67,6 @@ class StockController(AccountsController):
 		self.validate_putaway_capacity()
 		self.reset_conversion_factor()
 
-<<<<<<< HEAD
-=======
-	def on_update(self):
-		super().on_update()
-		self.check_zero_rate()
-
 	def validate_warehouse_of_sabb(self):
 		if self.is_internal_transfer():
 			return
@@ -112,7 +106,6 @@ class StockController(AccountsController):
 					sabb_doc = frappe.get_doc("Serial and Batch Bundle", row.serial_and_batch_bundle)
 					sabb_doc.validate_serial_no_status()
 
->>>>>>> 9b8f685c82 (fix: validate warehouse of SABB for draft entry)
 	def reset_conversion_factor(self):
 		for row in self.get("items"):
 			if row.uom != row.stock_uom:
