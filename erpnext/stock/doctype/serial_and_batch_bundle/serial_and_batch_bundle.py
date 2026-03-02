@@ -791,21 +791,14 @@ class SerialandBatchBundle(Document):
 		if not self.voucher_detail_no or self.voucher_detail_no != row.name:
 			values_to_set["voucher_detail_no"] = row.name
 
-<<<<<<< HEAD
 		if parent.get("posting_date") and (not self.posting_date or self.posting_date != parent.posting_date):
 			values_to_set["posting_date"] = parent.posting_date or today()
 
 		if parent.get("posting_time") and (not self.posting_time or self.posting_time != parent.posting_time):
 			values_to_set["posting_time"] = parent.posting_time
-=======
+
 		if row.get("doctype") == "Packed Item" and row.get("parent_detail_docname"):
 			values_to_set["voucher_detail_no"] = row.get("parent_detail_docname")
-
-		if parent.get("posting_date") and parent.get("posting_time"):
-			posting_datetime = combine_datetime(parent.posting_date, parent.posting_time)
-			if not self.posting_datetime or self.posting_datetime != posting_datetime:
-				values_to_set["posting_datetime"] = posting_datetime
->>>>>>> c37a56ec89 (fix: voucher detail no in SABB)
 
 		if parent.doctype in [
 			"Delivery Note",
