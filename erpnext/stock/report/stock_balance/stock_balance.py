@@ -368,6 +368,212 @@ class StockBalanceReport:
 
 		self.sle_query = query
 
+<<<<<<< HEAD
+=======
+	def prepare_item_warehouse_map_for_current_period(self):
+		self.opening_vouchers = self.get_opening_vouchers()
+
+		if self.filters.get("show_stock_ageing_data"):
+			self.sle_entries = self.sle_query.run(as_dict=True)
+
+		self.prepare_stock_reco_voucher_wise_count()
+
+		# HACK: This is required to avoid causing db query in flt
+		_system_settings = frappe.get_cached_doc("System Settings")
+		with frappe.db.unbuffered_cursor():
+			if not self.filters.get("show_stock_ageing_data"):
+				self.sle_entries = self.sle_query.run(as_dict=True, as_iterator=True)
+
+			for entry in self.sle_entries:
+				group_by_key = self.get_group_by_key(entry)
+				if group_by_key not in self.item_warehouse_map:
+					self.initialize_data(group_by_key, entry)
+
+				self.prepare_item_warehouse_map(entry, group_by_key)
+
+		self.item_warehouse_map = filter_items_with_no_transactions(
+			self.item_warehouse_map, self.float_precision, self.inventory_dimensions
+		)
+
+	def prepare_stock_reco_voucher_wise_count(self):
+		self.stock_reco_voucher_wise_count = frappe._dict()
+
+		doctype = frappe.qb.DocType("Stock Ledger Entry")
+		item = frappe.qb.DocType("Item")
+
+		query = (
+			frappe.qb.from_(doctype)
+			.inner_join(item)
+			.on(doctype.item_code == item.name)
+			.select(doctype.voucher_detail_no, Count(doctype.name).as_("count"))
+			.where(
+				(doctype.voucher_type == "Stock Reconciliation")
+				& (doctype.docstatus < 2)
+				& (doctype.is_cancelled == 0)
+				& (item.has_serial_no == 1)
+			)
+			.groupby(doctype.voucher_detail_no)
+		)
+
+		data = query.run(as_dict=True)
+		if not data:
+			return
+
+		for row in data:
+			if row.count != 1:
+				continue
+
+			current_qty = frappe.db.get_value(
+				"Stock Reconciliation Item", row.voucher_detail_no, "current_qty"
+			)
+			self.stock_reco_voucher_wise_count[row.voucher_detail_no] = current_qty
+
+	def prepare_new_data(self):
+		if self.filters.get("show_stock_ageing_data"):
+			self.filters["show_warehouse_wise_stock"] = True
+			item_wise_fifo_queue = FIFOSlots(self.filters).generate()
+
+		_func = itemgetter(1)
+
+		del self.sle_entries
+
+		sre_details = self.get_sre_reserved_qty_details()
+
+		variant_values = {}
+		if self.filters.get("show_variant_attributes"):
+			variant_values = self.get_variant_values_for()
+
+		for _key, report_data in self.item_warehouse_map.items():
+			if variant_data := variant_values.get(report_data.item_code):
+				report_data.update(variant_data)
+
+			if self.filters.get("show_stock_ageing_data"):
+				opening_fifo_queue = self.get_opening_fifo_queue(report_data) or []
+
+				fifo_queue = []
+				if fifo_queue := item_wise_fifo_queue.get((report_data.item_code, report_data.warehouse)):
+					fifo_queue = fifo_queue.get("fifo_queue")
+
+				if fifo_queue:
+					opening_fifo_queue.extend(fifo_queue)
+
+				stock_ageing_data = {"average_age": 0, "earliest_age": 0, "latest_age": 0}
+
+				if opening_fifo_queue:
+					fifo_queue = sorted(filter(_func, opening_fifo_queue), key=_func)
+					if not fifo_queue:
+						continue
+
+					to_date = self.to_date
+					stock_ageing_data["average_age"] = get_average_age(fifo_queue, to_date)
+					stock_ageing_data["earliest_age"] = date_diff(to_date, fifo_queue[0][1])
+					stock_ageing_data["latest_age"] = date_diff(to_date, fifo_queue[-1][1])
+					stock_ageing_data["fifo_queue"] = fifo_queue
+
+				report_data.update(stock_ageing_data)
+
+			report_data.update(
+				{"reserved_stock": sre_details.get((report_data.item_code, report_data.warehouse), 0.0)}
+			)
+
+			if (
+				not self.filters.get("include_zero_stock_items")
+				and report_data
+				and report_data.bal_qty == 0
+				and report_data.bal_val == 0
+			):
+				continue
+
+			self.data.append(report_data)
+
+	def get_sre_reserved_qty_details(self) -> dict:
+		from erpnext.stock.doctype.stock_reservation_entry.stock_reservation_entry import (
+			get_sre_reserved_qty_for_items_and_warehouses as get_reserved_qty_details,
+		)
+
+		item_code_list, warehouse_list = [], []
+		for d in self.item_warehouse_map:
+			item_code_list.append(d[0])
+			warehouse_list.append(d[1])
+
+		return get_reserved_qty_details(item_code_list, warehouse_list)
+
+	def prepare_item_warehouse_map(self, entry, group_by_key):
+		qty_dict = self.item_warehouse_map[group_by_key]
+		for field in self.inventory_dimensions:
+			qty_dict[field] = entry.get(field)
+
+		if entry.voucher_type == "Stock Reconciliation" and (
+			not entry.batch_no or entry.serial_no or entry.serial_and_batch_bundle
+		):
+			if entry.serial_no and entry.voucher_detail_no in self.stock_reco_voucher_wise_count:
+				qty_dict.opening_qty -= self.stock_reco_voucher_wise_count.get(entry.voucher_detail_no, 0)
+				qty_dict.bal_qty = 0.0
+				qty_diff = flt(entry.actual_qty)
+			else:
+				qty_diff = flt(entry.qty_after_transaction) - flt(qty_dict.bal_qty)
+		else:
+			qty_diff = flt(entry.actual_qty)
+
+		value_diff = flt(entry.stock_value_difference)
+
+		if entry.posting_date < self.from_date or entry.voucher_no in self.opening_vouchers.get(
+			entry.voucher_type, []
+		):
+			qty_dict.opening_qty += qty_diff
+			qty_dict.opening_val += value_diff
+
+		elif entry.posting_date >= self.from_date and entry.posting_date <= self.to_date:
+			if flt(qty_diff, self.float_precision) >= 0:
+				qty_dict.in_qty += qty_diff
+			else:
+				qty_dict.out_qty += abs(qty_diff)
+
+			if flt(value_diff, self.float_precision) >= 0:
+				qty_dict.in_val += value_diff
+			else:
+				qty_dict.out_val += abs(value_diff)
+
+		qty_dict.val_rate = entry.valuation_rate
+		qty_dict.bal_qty += qty_diff
+		qty_dict.bal_val += value_diff
+
+	def initialize_data(self, group_by_key, entry):
+		self.item_warehouse_map[group_by_key] = frappe._dict(
+			{
+				"item_code": entry.item_code,
+				"warehouse": entry.warehouse,
+				"item_group": entry.item_group,
+				"company": entry.company,
+				"currency": self.company_currency,
+				"stock_uom": entry.stock_uom,
+				"item_name": entry.item_name,
+				"opening_qty": 0.0,
+				"opening_val": 0.0,
+				"opening_fifo_queue": [],
+				"in_qty": 0.0,
+				"in_val": 0.0,
+				"out_qty": 0.0,
+				"out_val": 0.0,
+				"bal_qty": 0.0,
+				"bal_val": 0.0,
+				"val_rate": 0.0,
+			}
+		)
+
+	def get_group_by_key(self, row) -> tuple:
+		group_by_key = [row.item_code, row.warehouse]
+
+		for fieldname in self.inventory_dimensions:
+			if not row.get(fieldname):
+				continue
+
+			if self.filters.get(fieldname) or self.filters.get("show_dimension_wise_stock"):
+				group_by_key.append(row.get(fieldname))
+
+		return tuple(group_by_key)
+
+>>>>>>> d7fdab99cb (fix: opening qty in stock balance)
 	def apply_inventory_dimensions_filters(self, query, sle) -> str:
 		inventory_dimension_fields = self.get_inventory_dimension_fields()
 		if inventory_dimension_fields:
