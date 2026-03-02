@@ -492,7 +492,8 @@
    "fieldtype": "Link",
    "label": "Reference Purchase Receipt",
    "options": "Purchase Receipt",
-   "read_only": 1
+   "read_only": 1,
+   "search_index": 1
   },
   {
    "fieldname": "project",
@@ -616,7 +617,11 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
+<<<<<<< HEAD
  "modified": "2025-10-14 15:10:38.373099",
+=======
+ "modified": "2026-03-02 14:05:23.116017",
+>>>>>>> 8c94396ad9 (perf: add index on reference_purchase_receipt column)
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Entry Detail",
