@@ -242,7 +242,7 @@ class Item(Document):
 						'Image in the description has been removed. To disable this behavior, uncheck "{0}" in {1}.'
 					).format(
 						frappe.get_meta("Stock Settings").get_label("clean_description_html"),
-						get_link_to_form("Stock Settings"),
+						get_link_to_form("Stock Settings", "Stock Settings"),
 					),
 					alert=True,
 				)
