@@ -1702,7 +1702,7 @@ def check_item_quality_inspection(doctype, items):
 
 
 @frappe.whitelist()
-def make_quality_inspections(doctype, docname, items):
+def make_quality_inspections(company, doctype, docname, items):
 	if isinstance(items, str):
 		items = json.loads(items)
 
@@ -1721,6 +1721,7 @@ def make_quality_inspections(doctype, docname, items):
 
 		quality_inspection = frappe.get_doc(
 			{
+				"company": company,
 				"doctype": "Quality Inspection",
 				"inspection_type": "Incoming",
 				"inspected_by": frappe.session.user,
