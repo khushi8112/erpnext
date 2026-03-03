@@ -350,11 +350,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
-<<<<<<< HEAD
- "modified": "2026-01-05 14:27:33.329810",
-=======
  "modified": "2026-03-01 23:38:48.079274",
->>>>>>> 49d363b174 (fix: handle html email template separately in RFQ to avoid jinja context error)
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Request for Quotation",
