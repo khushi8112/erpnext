@@ -81,7 +81,7 @@ class MaterialRequest(BuyingController):
 			{
 				"source_dt": "Material Request Item",
 				"target_dt": "Sales Order Item",
-				"target_field": "ordered_qty",
+				"target_field": "requested_qty",
 				"target_parent_dt": "Sales Order",
 				"target_parent_field": "",
 				"join_field": "sales_order_item",
@@ -248,6 +248,8 @@ class MaterialRequest(BuyingController):
 	def on_cancel(self):
 		self.update_requested_qty_in_production_plan()
 		self.update_requested_qty()
+		if self.material_request_type == "Purchase":
+			self.update_prevdoc_status()
 
 	def get_mr_items_ordered_qty(self, mr_items):
 		mr_items_ordered_qty = {}
