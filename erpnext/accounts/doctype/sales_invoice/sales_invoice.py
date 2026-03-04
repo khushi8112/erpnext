@@ -1199,6 +1199,9 @@ class SalesInvoice(SellingController):
 				throw(_("Delivery Note {0} is not submitted").format(d.delivery_note))
 
 	def process_asset_depreciation(self):
+		if self.is_internal_transfer():
+			return
+
 		if (self.is_return and self.docstatus == 2) or (not self.is_return and self.docstatus == 1):
 			self.depreciate_asset_on_sale()
 		else:
