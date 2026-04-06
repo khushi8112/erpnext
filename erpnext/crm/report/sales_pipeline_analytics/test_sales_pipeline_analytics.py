@@ -196,6 +196,7 @@ def create_customer():
 	if not doc:
 		doc = frappe.new_doc("Customer")
 		doc.customer_name = "_Test NC"
+		doc.customer_group = "_Test Customer Group"
 		doc.insert()
 
 
