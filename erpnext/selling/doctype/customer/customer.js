@@ -116,11 +116,16 @@ frappe.ui.form.on("Customer", {
 					address_dict: frm.doc.customer_primary_address,
 				},
 				callback: function (r) {
-					frm.set_value("primary_address", frappe.utils.html2text(r.message));
+					const html = r.message || "";
+					const text = html
+						.replace(/<br\s*\/?>/gi, "\n")
+						.replace(/<[^>]+>/g, "")
+						.replace(/\n{2,}/g, "\n")
+						.trim();
+					frm.set_value("primary_address", text);
 				},
 			});
-		}
-		if (!frm.doc.customer_primary_address) {
+		} else {
 			frm.set_value("primary_address", "");
 		}
 	},
@@ -154,7 +159,28 @@ frappe.ui.form.on("Customer", {
 		}
 
 		if (!frm.doc.__islocal) {
-			frappe.contacts.render_address_and_contact(frm);
+			erpnext.utils.bind_address_quick_entry(frm, {
+				after_insert: (doc) => {
+					if (!frm.doc.customer_primary_address) {
+						return frappe.db.set_value(
+							"Customer",
+							frm.doc.name,
+							"customer_primary_address",
+							doc.name
+						);
+					}
+				},
+				on_set_primary: (addr_name) => {
+					return frappe.db.set_value(
+						"Customer",
+						frm.doc.name,
+						"customer_primary_address",
+						addr_name
+					);
+				},
+			});
+
+			erpnext.utils.bind_contact_quick_entry(frm);
 
 			// custom buttons
 

@@ -360,6 +360,60 @@ class TestCustomer(ERPNextTestSuite):
 		self.assertIsNone(customer.get_notification_email())
 
 
+class TestCustomerAddressQuickEntry(ERPNextTestSuite):
+	CUSTOMER_NAME = "_Test Address Quick Entry Customer"
+
+	def setUp(self):
+		if not frappe.db.exists("Customer", self.CUSTOMER_NAME):
+			frappe.get_doc(
+				{
+					"doctype": "Customer",
+					"customer_name": self.CUSTOMER_NAME,
+					"customer_group": "_Test Customer Group",
+					"territory": "_Test Territory",
+				}
+			).insert(ignore_permissions=True)
+
+	def _make_address(self, address_type="Billing", **kwargs):
+		return frappe.get_doc(
+			{
+				"doctype": "Address",
+				"address_title": self.CUSTOMER_NAME,
+				"address_type": address_type,
+				"address_line1": "123 Main Street",
+				"city": "Mumbai",
+				"country": "India",
+				"links": [{"link_doctype": "Customer", "link_name": self.CUSTOMER_NAME}],
+				**kwargs,
+			}
+		).insert(ignore_permissions=True)
+
+	def test_new_address_links_to_customer(self):
+		address = self._make_address()
+		linked = frappe.get_all(
+			"Address",
+			filters=[
+				["Dynamic Link", "link_doctype", "=", "Customer"],
+				["Dynamic Link", "link_name", "=", self.CUSTOMER_NAME],
+			],
+			pluck="name",
+		)
+		self.assertIn(address.name, linked)
+
+	def test_address_appears_in_display_list(self):
+		from frappe.contacts.doctype.address.address import get_address_display_list
+
+		address = self._make_address()
+		names = [e["name"] for e in get_address_display_list("Customer", self.CUSTOMER_NAME)]
+		self.assertIn(address.name, names)
+
+	def test_set_primary_unsets_previous(self):
+		first = self._make_address(is_primary_address=1)
+		second = self._make_address(address_type="Shipping", is_primary_address=1)
+		self.assertEqual(frappe.db.get_value("Address", first.name, "is_primary_address"), 0)
+		self.assertEqual(frappe.db.get_value("Address", second.name, "is_primary_address"), 1)
+
+
 def get_customer_dict(customer_name):
 	return {
 		"customer_group": "_Test Customer Group",
