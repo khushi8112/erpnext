@@ -37,6 +37,34 @@ frappe.ui.form.AddressQuickEntryForm = class AddressQuickEntryForm extends frapp
 	}
 };
 
+frappe.ui.form.ContactQuickEntryForm = class ContactQuickEntryForm extends frappe.ui.form.QuickEntryForm {
+	set_meta_and_mandatory_fields() {
+		this.meta = frappe.get_meta(this.doctype);
+		const field = (name) => {
+			const df = frappe.meta.get_docfield("Contact", name);
+			if (!df) return null;
+			return Object.assign({}, df, { read_only: 0 });
+		};
+		this.docfields = [
+			field("first_name"),
+			field("last_name"),
+			field("email_id"),
+			field("mobile_no"),
+			field("is_primary_contact"),
+		].filter(Boolean);
+	}
+
+	update_doc() {
+		const doc = super.update_doc();
+		if (!doc.links?.length && frappe.dynamic_link) {
+			const link = frappe.model.add_child(doc, "Dynamic Link", "links");
+			link.link_doctype = frappe.dynamic_link.doctype;
+			link.link_name = frappe.dynamic_link.doc[frappe.dynamic_link.fieldname];
+		}
+		return doc;
+	}
+};
+
 const ADDRESS_LIST_TEMPLATE = `
 <p>
 	<button class="btn btn-xs btn-default btn-address">{{ __("New Address") }}</button>
@@ -88,7 +116,7 @@ erpnext.utils.bind_contact_quick_entry = function (frm) {
 			.find(".btn-contact")
 			.on("click", () => {
 				frappe.dynamic_link = { doctype: frm.doc.doctype, doc: frm.doc, fieldname: "name" };
-				frappe.new_doc("Contact");
+				frappe.ui.form.make_quick_entry("Contact", () => frm.reload_doc());
 			});
 	}
 };
