@@ -158,6 +158,8 @@ frappe.ui.form.on("Customer", {
 			erpnext.toggle_naming_series();
 		}
 
+		frm.toggle_display("primary_address_and_contact_detail", false);
+
 		if (!frm.doc.__islocal) {
 			erpnext.utils.bind_address_quick_entry(frm, {
 				after_insert: (doc) => {

@@ -40,18 +40,13 @@ frappe.ui.form.AddressQuickEntryForm = class AddressQuickEntryForm extends frapp
 frappe.ui.form.ContactQuickEntryForm = class ContactQuickEntryForm extends frappe.ui.form.QuickEntryForm {
 	set_meta_and_mandatory_fields() {
 		this.meta = frappe.get_meta(this.doctype);
-		const field = (name) => {
-			const df = frappe.meta.get_docfield("Contact", name);
-			if (!df) return null;
-			return Object.assign({}, df, { read_only: 0 });
-		};
 		this.docfields = [
-			field("first_name"),
-			field("last_name"),
-			field("email_id"),
-			field("mobile_no"),
-			field("is_primary_contact"),
-		].filter(Boolean);
+			{ fieldname: "first_name", fieldtype: "Data", label: __("First Name"), reqd: 1 },
+			{ fieldname: "last_name", fieldtype: "Data", label: __("Last Name") },
+			{ fieldname: "email_id", fieldtype: "Data", label: __("Email"), options: "Email" },
+			{ fieldname: "mobile_no", fieldtype: "Data", label: __("Mobile No"), options: "Phone" },
+			{ fieldname: "is_primary_contact", fieldtype: "Check", label: __("Is Primary Contact") },
+		];
 	}
 
 	update_doc() {
@@ -106,19 +101,69 @@ const ADDRESS_LIST_TEMPLATE = `
 {% } %}
 `;
 
+const CONTACT_LIST_TEMPLATE = `
+<p>
+	<button class="btn btn-xs btn-default btn-contact">{{ __("New Contact") }}</button>
+</p>
+<div class="clearfix"></div>
+{% for (const contact of contact_list) { %}
+	<div style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:12px 14px;margin-bottom:10px">
+		<div class="flex justify-between align-items-start mb-1">
+			<div>
+				<strong>{%= contact.full_name %}</strong>
+				{% if (contact.is_primary_contact) { %}
+					<span class="indicator-pill blue no-indicator-dot">{%= __("Primary") %}</span>
+				{% } %}
+			</div>
+			<a
+				href="{%= frappe.utils.get_form_link('Contact', contact.name) %}"
+				class="text-muted"
+				title="{%= __('Edit') %}"
+			><svg class="icon icon-xs"><use href="#icon-edit"></use></svg></a>
+		</div>
+		{% if (contact.designation) { %}
+			<p class="text-muted small mb-1">{%= contact.designation %}</p>
+		{% } %}
+		{% const display_email = contact.email_id || (contact.email_ids && contact.email_ids[0]?.email_id); %}
+		{% const display_phone = contact.mobile_no || contact.phone || (contact.phone_nos && contact.phone_nos[0]?.phone); %}
+		{% if (display_email) { %}
+			<p class="text-muted small mb-0">{%= display_email %}</p>
+		{% } %}
+		{% if (display_phone) { %}
+			<p class="text-muted small mb-0">{%= display_phone %}</p>
+		{% } %}
+		{% if (!contact.is_primary_contact) { %}
+			<div class="mt-3 pt-2" style="border-top:1px solid var(--border-color)">
+				<button class="btn btn-xs btn-default btn-set-primary-contact" data-contact="{%= contact.name %}">{%= __("Set as Primary") %}</button>
+			</div>
+		{% } %}
+	</div>
+{% } %}
+{% if (!contact_list.length) { %}
+	<p class="text-muted small">{%= __("No contacts added yet.") %}</p>
+{% } %}
+`;
+
 erpnext.utils.bind_contact_quick_entry = function (frm) {
 	const wrapper = $(frm.fields_dict.contact_html?.wrapper);
 	if (!wrapper.length) return;
 
-	if (frm.doc.__onload && "contact_list" in frm.doc.__onload) {
-		$(wrapper).html(frappe.render_template("contact_list", frm.doc.__onload));
-		$(wrapper)
-			.find(".btn-contact")
-			.on("click", () => {
-				frappe.dynamic_link = { doctype: frm.doc.doctype, doc: frm.doc, fieldname: "name" };
-				frappe.ui.form.make_quick_entry("Contact", () => frm.reload_doc());
-			});
-	}
+	const contact_list = frm.doc.__onload?.contact_list || [];
+	wrapper.html(frappe.render_template(CONTACT_LIST_TEMPLATE, { contact_list }));
+
+	wrapper.off("click.contact_quick");
+
+	wrapper.on("click.contact_quick", ".btn-contact", () => {
+		frappe.dynamic_link = { doctype: frm.doc.doctype, doc: frm.doc, fieldname: "name" };
+		frappe.ui.form.make_quick_entry("Contact", () => frm.reload_doc());
+	});
+
+	wrapper.on("click.contact_quick", ".btn-set-primary-contact", async function () {
+		const contact_name = $(this).data("contact");
+		await frappe.db.set_value("Contact", contact_name, "is_primary_contact", 1);
+		frappe.show_alert({ message: __("Set as primary contact"), indicator: "blue" });
+		frm.reload_doc();
+	});
 };
 
 erpnext.utils.bind_address_quick_entry = function (frm, options = {}) {
