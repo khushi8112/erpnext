@@ -90,7 +90,7 @@ const ADDRESS_LIST_TEMPLATE = `
 		<p class="text-muted small mb-0">{%= [addr.address_line1, addr.address_line2].filter(Boolean).join(", ") %}</p>
 		<p class="text-muted small mb-0">{%= [addr.city, addr.state, addr.pincode, addr.country].filter(Boolean).join(", ") %}</p>
 		{% if (!addr.is_primary_address) { %}
-			<div class="mt-3 pt-2" style="border-top:1px solid var(--border-color)">
+			<div class="mt-3 pt-2">
 				<button class="btn btn-xs btn-default btn-set-primary" data-address="{%= addr.name %}">{%= __("Set as Primary") %}</button>
 			</div>
 		{% } %}
@@ -133,7 +133,7 @@ const CONTACT_LIST_TEMPLATE = `
 			<p class="text-muted small mb-0">{%= display_phone %}</p>
 		{% } %}
 		{% if (!contact.is_primary_contact) { %}
-			<div class="mt-3 pt-2" style="border-top:1px solid var(--border-color)">
+			<div class="mt-3 pt-2">
 				<button class="btn btn-xs btn-default btn-set-primary-contact" data-contact="{%= contact.name %}">{%= __("Set as Primary") %}</button>
 			</div>
 		{% } %}
